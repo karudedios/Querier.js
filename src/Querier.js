@@ -48,20 +48,15 @@ export default (() => {
       select(cb){
         let $q = this.dictionary;
         let keys = Object.keys($q);
-
-        let leftCompose = (f1, f2) => (...args) => console.log(f1, f2, args) || f1(f2(...args));
         
         if (keys.length === 0) return;
-
-        let fn = keys.reduceRight((composed, key) => leftCompose(() => $q[key].selectMany, composed), () => $q[keys.pop()].select);
-        console.log(fn(cb));
-
+        
         let getAction = (orig, i) => orig.length === (i + 1) ? 'select' : 'selectMany';
         let resolveReduce = (str, k, i, orig) => str.format(getFormat(getBody($q[k]), getAction(orig, i), k));
 
         let ac = keys.reduce(resolveReduce, '{0};').format(`cb(${ getArgs(cb) })`);
 
-        //return eval(ac);
+        return eval(ac);
       }
     }
 
