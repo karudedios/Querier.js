@@ -2,70 +2,61 @@ export default (() => {
   "use strict";
 
   let Querier = (() => {
-    Object.prototype.put = function(key, value) {
-      this[key] = value;
-      return this;
-    };
-
-    Object.prototype.putWhen = function(predicate, key, value) {
-      return predicate
-        ? this.put(key, value)
-        : this;
-    };
-
     String.prototype.format = function(...args) {
       return this.replace(/\{(\d)\}/g, (_, $1) => args[+$1]);
     };
 
     let getArgs = (f) => f.toString().match(/\((.*)\)\W?{/)[1].replace(/ /g, '');
-    let getBody = (value) => value instanceof Function ? `(${getArgs(value)})` : '';
-    let getFormat = (body, action, k) => `$q['${k}']${body}.${action}(function(${k}) { return {0}; })`;
+    let getBody = (value, idx) => value.where ? `.where($q[${idx}].where)` : '';
+    let getFormat = (body, action, k, idx) => `$q[${idx}].queryableEntity${body}.${action}(function(${k.name}) { return {0}; })`;
 
-    class Querier {
-      constructor(dictionary) {
-        this.dictionary = dictionary || {};
-      }
-
-      pipeMany(...pipes){
-        return pipes.reduce((query, pipe) => query.pipe(pipe), this);
-      }
-
-      pipe({ as, from, where }){
-        let id = Object.keys(this.dictionary).filter((k) => k.indexOf('_') > -1).length;
-        let _from = `_${id + 1}`;
-
-        return new Querier(this.dictionary.put(as, from).putWhen(where !== undefined, _from, where));
-      }
-
-      from(name){
-        return {
-          in: (selectable) => {
-            return new Querier(this.dictionary.put(name, selectable));
-          }
-        };
-      }
-
-      select(cb){
-        let $q = this.dictionary;
-        let keys = Object.keys($q);
-
-        let leftCompose = (f1, f2) => (...args) => console.log(f1, f2, args) || f1(f2(...args));
-        
-        if (keys.length === 0) return;
-
-        let fn = keys.reduceRight((composed, key) => leftCompose(() => $q[key].selectMany, composed), () => $q[keys.pop()].select);
-        console.log(fn(cb));
-
-        let getAction = (orig, i) => orig.length === (i + 1) ? 'select' : 'selectMany';
-        let resolveReduce = (str, k, i, orig) => str.format(getFormat(getBody($q[k]), getAction(orig, i), k));
-
-        let ac = keys.reduce(resolveReduce, '{0};').format(`cb(${ getArgs(cb) })`);
-
-        //return eval(ac);
+    class QueryableObject {
+      constructor({name, queryableEntity, where}) {
+        Object.assign(this, { name, queryableEntity, where });
       }
     }
 
-    return { new(init) { return new Querier(init || {}) } };
+    class Querier {
+      constructor(queryableObjects) {
+        Object.defineProperty(this, 'queryableObjects', { value: queryableObjects });
+      }
+
+      pipe({ as, from, where }){
+        let queryableObject = new QueryableObject({
+          name: as,
+          queryableEntity: from,
+          where: where
+        });
+
+        return new Query(this.queryableObjects.concat([queryableObject]));
+      }
+    }
+
+    class EmptyQuery extends Querier {
+      constructor() {
+        super([]);
+      }
+    }
+
+    class Query extends Querier {
+      constructor(queryableObjects) {
+        super(queryableObjects);
+      }
+
+      select(func) {
+        let $q = this.queryableObjects;
+        
+        if ($q.length === 0) return;
+        
+        let getAction = (orig, i) => orig.length === (i + 1) ? 'select' : 'selectMany';
+        let resolveReduce = (str, value, i, orig) => str.format(getFormat(getBody(value, i), getAction(orig, i), value, i));
+
+        let ac = $q.reduce(resolveReduce, '{0};').format(`func(${ getArgs(func) })`);
+        return eval(ac);
+      }
+    }
+
+    return { build() { return new EmptyQuery() } };
   })();
 
   return { Querier };
