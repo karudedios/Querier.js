@@ -4,7 +4,7 @@
   "description": "Ease to query Enumerable entities",
   "main": "src/Querier.js",
   "scripts": {
-    "test": "jasmine",
+    "test": "jasmine --no-color tests/spec/Querier-spec.js",
     "lint": "jshint --verbose src/Querier.js",
     "build": "npm run test && npm run lint"
   },

@@ -56,7 +56,7 @@ export default (() => {
       }
     }
 
-    return { build(init) { return new EmptyQuery() } };
+    return { build() { return new EmptyQuery() } };
   })();
 
   return { Querier };
