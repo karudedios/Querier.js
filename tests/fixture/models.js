@@ -1,47 +1,57 @@
 export default (() => {
   class List {
-    constructor() {}
-
-    match({ cons, nil }) {
-      return this instanceof NodeList
-        ? cons(this.value)
-        : nil();
+    constructor(isEmpty) {
+      Object.defineProperty(this, 'isEmpty', { value: isEmpty });
     }
 
-    toArray() {
+    match({ node, empty }) {
+      return this instanceof NodeList
+        ? node(this.value, this.tail)
+        : empty();
+    }
+
+    concat(list) {
       return this.match({
-        cons: (v) => [].concat([], [v], this.tail.toArray()),
-        nil: () => []
+        node: (h, t) => new NodeList(h, t.concat(list)),
+        empty: () => list
       });
     }
 
     select(func) {
-      return this.toArray().map(func).reduceRight((cons, item) => new NodeList(item, cons), new EmptyList);
+      return this.match({
+        node: (h, t) => new NodeList(func(h), t.select(func)),
+        empty: () => this
+      });
     }
 
     selectMany(func) {
       return this.match({
-        cons: (v) => [].concat([], [v], this.tail.selectMany(func)),
-        nil: () => []
-      })
-       
+        node: (h, t) => func(h).concat(t.selectMany(func)),
+        empty: () => this
+      });
+    }
+
+    where(predicate) {
+      return this.match({
+        node: (h, t) => predicate(h) ? new NodeList(h, t.where(predicate)) : t.where(predicate),
+        empty: () => new EmptyList
+      });
     }
   }
 
   class EmptyList extends List {
     constructor() {
-      super();
-      this.isEmpty = true;
+      super(true);
     }
 
     toString() {
-      return `Emty List`;
+      return `Empty List`;
     }
   }
 
   class NodeList extends List {
     constructor(value, tail) {
-      super();
+      super(false);
       Object.assign(this, { value, tail });
     }
 
@@ -51,11 +61,6 @@ export default (() => {
         : `${this.value}`;
     }
   }
-
-  let list = new NodeList(1, new NodeList(2, new EmptyList));
-  console.log(
-    list.selectMany(x => list.select(y => x + y))
-  )
 
   return { NodeList, EmptyList }
 })();
