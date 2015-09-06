@@ -21,31 +21,57 @@ export default (() => {
     let getBody = (value) => value instanceof Function ? `(${getArgs(value)})` : '';
     let getFormat = (body, action, k) => `$q['${k}']${body}.${action}(function(${k}) { return {0}; })`;
 
+    class QueryableObject {
+      constructor(name, enumerable, where) {
+        Object.assign(this, { name, enumerable, where });
+      }
+    }
+
     class Querier {
       constructor(dictionary) {
-        this.dictionary = dictionary || {};
+        Object.defineProperty(this, 'dictionary', { value: dictionary });
       }
 
-      pipeMany(...pipes){
+      pipeMany(...pipes) {
         return pipes.reduce((query, pipe) => query.pipe(pipe), this);
       }
 
       pipe({ as, from, where }){
         let id = Object.keys(this.dictionary).filter((k) => k.indexOf('_') > -1).length;
         let _from = `_${id + 1}`;
+        let f = (_) => from.where(_);
 
-        return new Querier(this.dictionary.put(as, from).putWhen(where !== undefined, _from, where));
+        return new Query(this.dictionary.put(as, from).putWhen(where !== undefined, _from, where));
       }
 
-      from(name){
+      from(name) {
         return {
           in: (selectable) => {
-            return new Querier(this.dictionary.put(name, selectable));
+            return new Query(this.dictionary.put(name, selectable));
           }
         };
       }
+    }
 
-      select(cb){
+    class EmptyQuery extends Querier {
+      constructor() {
+        super({});
+      }
+    }
+
+    class Query extends Querier {
+      constructor(dictionary) {
+        super(dictionary);
+      }
+
+      where(predicate) {
+        let id = Object.keys(this.dictionary).filter((k) => k.indexOf('_') > -1).length;
+        let _from = `_${id + 1}`;
+
+        return new Querier(this.dictionary.put(_from, predicate));
+      }
+
+      select(cb) {
         let $q = this.dictionary;
         let keys = Object.keys($q);
         
@@ -55,12 +81,12 @@ export default (() => {
         let resolveReduce = (str, k, i, orig) => str.format(getFormat(getBody($q[k]), getAction(orig, i), k));
 
         let ac = keys.reduce(resolveReduce, '{0};').format(`cb(${ getArgs(cb) })`);
-
+        console.log(ac)
         return eval(ac);
       }
     }
 
-    return { new(init) { return new Querier(init || {}) } };
+    return { build(init) { return new EmptyQuery() } };
   })();
 
   return { Querier };
