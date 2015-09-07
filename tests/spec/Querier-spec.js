@@ -3,6 +3,50 @@ import { Querier } from '../../src/Querier'
 
 describe("Querier", () => {
 
+  describe("exception handling", () => {
+    class ObjectWithoutSelect {}
+    class ObjectWithoutSelectMany { select() {} }
+    class ObjectWithoutWhere { select() {} selectMany() {} }
+
+    it("should throw an exception when an object without 'select' clause is used", () => {
+      let expected = "The selected Object doesn't posses a 'select' clause to use";
+      
+      let failingFunction = () => Querier.append({ as: 'fail', from: new ObjectWithoutSelect });
+      
+      expect(failingFunction).toThrow(expected)
+    });
+
+    it("should throw an exception when several objects without 'selectMany' clause are used", () => {
+      let expected = "Some of the selected objects doesn't posses a 'selectMany' so multiple objects cannot be enumerated";
+      
+      let failingFunction = () => Querier
+        .append({ as: 'fail1', from: new ObjectWithoutSelectMany })
+        .append({ as: 'fail2', from: new ObjectWithoutSelectMany });
+
+      expect(failingFunction).toThrow(expected);
+    });
+
+    it("should throw an exception when an objects without 'where' clause is used", () => {
+      let expected = "The selected Object doesn't posses a 'where' clause to use";
+      
+      let failingFunction = () => Querier
+        .append({ as: 'fail', from: new ObjectWithoutWhere, where: (fail) => true });
+
+      expect(failingFunction).toThrow(expected);
+    });
+
+    it("should throw an exception when different objects try to be enumerated", () => {
+      let expected = "Only objects of the same instance can be enumerated in a single query";
+      
+      let failingFunction = () => Querier
+        .append({ as: 'fail1', from: new ObjectWithoutWhere })
+        .append({ as: 'fail2', from: new ObjectWithoutSelect })
+        .append({ as: 'fail3', from: new ObjectWithoutSelectMany });
+
+      expect(failingFunction).toThrow(expected);
+    });
+  });
+
   describe("pipe", () => {
     let list = new NodeList(1, new NodeList(2, new NodeList(3, new EmptyList)));
 
