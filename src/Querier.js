@@ -2,17 +2,15 @@ export default (() => {
   "use strict";
 
   let Querier = (() => {
-    String.prototype.format = function(...args) {
-      return this.replace(/\{(\d)\}/g, (_, $1) => args[+$1]);
-    };
-
-    let getArgs = (f) => f.toString().match(/\((.*)\)\W?{/)[1].replace(/ /g, '');
-    let getBody = (value, idx) => value.where ? `.where($q[${idx}].where)` : '';
-    let getFormat = (body, action, k, idx) => `$q[${idx}].queryableEntity${body}.${action}(function(${k.name}) { return {0}; })`;
-
     class QueryableObject {
       constructor({name, queryableEntity, where}) {
         Object.assign(this, { name, queryableEntity, where });
+      }
+
+      match({ queryableObjectPath, constraintObjectPath }) {
+        return this.where
+          ? constraintObjectPath(this.queryableEntity, this.where)
+          : queryableObjectPath(this.queryableEntity);
       }
     }
 
@@ -21,12 +19,30 @@ export default (() => {
         Object.defineProperty(this, 'queryableObjects', { value: queryableObjects });
       }
 
-      pipe({ as, from, where }){
+      append({ as, from, where }){
         let queryableObject = new QueryableObject({
           name: as,
           queryableEntity: from,
           where: where
         });
+
+        let constructor = from.constructor;
+
+        if (!this.queryableObjects.map(x => x.queryableEntity).every(object => object instanceof constructor)) {
+          throw "Only objects of the same instance can be enumerated in a single query";
+        }
+
+        if (this.queryableObjects.length > 0 && this.queryableObjects.some(qo => qo.queryableEntity.selectMany === undefined)) {
+          throw "Some of the selected objects doesn't posses a 'selectMany' so multiple objects cannot be enumerated";
+        }
+
+        if (!from.select) {
+          throw "The selected Object doesn't posses a 'select' clause to use";
+        }
+
+        if (where && !from.where) {
+         throw "The selected Object doesn't posses a 'where' clause to use";
+        }
 
         return new Query(this.queryableObjects.concat([queryableObject]));
       }
@@ -44,19 +60,22 @@ export default (() => {
       }
 
       select(func) {
-        let $q = this.queryableObjects;
-        
-        if ($q.length === 0) return;
-        
-        let getAction = (orig, i) => orig.length === (i + 1) ? 'select' : 'selectMany';
-        let resolveReduce = (str, value, i, orig) => str.format(getFormat(getBody(value, i), getAction(orig, i), value, i));
+        let bind = function(item, instruction, target) {
+          return (...args) => item[instruction](target.bind(item, ...args));
+        };
 
-        let ac = $q.reduce(resolveReduce, '{0};').format(`func(${ getArgs(func) })`);
-        return eval(ac);
+        return this.queryableObjects.reduceRight((func, item, idx, orig) => {
+          let entity = item.match({
+            queryableObjectPath: (entity) => entity,
+            constraintObjectPath: (entity, where) => entity.where(where)
+          });
+          
+          return bind(entity, (idx + 1 === orig.length) ? 'select' : 'selectMany', func);
+        }, func)();
       }
     }
 
-    return { build() { return new EmptyQuery() } };
+    return new EmptyQuery();
   })();
 
   return { Querier };
