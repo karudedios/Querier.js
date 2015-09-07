@@ -10,7 +10,7 @@ export default (() => {
       match({ queryableObjectPath, constraintObjectPath }) {
         return this.where
           ? constraintObjectPath(this.queryableEntity, this.where)
-          : queryableObjectPath(this.queryableEntity)
+          : queryableObjectPath(this.queryableEntity);
       }
     }
 
@@ -19,7 +19,7 @@ export default (() => {
         Object.defineProperty(this, 'queryableObjects', { value: queryableObjects });
       }
 
-      pipe({ as, from, where }){
+      append({ as, from, where }){
         let queryableObject = new QueryableObject({
           name: as,
           queryableEntity: from,
@@ -46,7 +46,7 @@ export default (() => {
 
         let bind = function(item, instruction, target) {
           return (...args) => item[instruction](target.bind(item, ...args));
-        }
+        };
 
         return $q.reduceRight((func, item, idx, orig) => {
           let entity = item.match({
@@ -54,12 +54,12 @@ export default (() => {
             constraintObjectPath: (entity, where) => entity.where(where)
           });
           
-          return bind(entity, (idx + 1 == orig.length) ? 'select' : 'selectMany', func);
+          return bind(entity, (idx + 1 === orig.length) ? 'select' : 'selectMany', func);
         }, func)();
       }
     }
 
-    return { build() { return new EmptyQuery() } };
+    return new EmptyQuery();
   })();
 
   return { Querier };
