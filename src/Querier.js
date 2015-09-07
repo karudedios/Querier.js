@@ -2,17 +2,15 @@ export default (() => {
   "use strict";
 
   let Querier = (() => {
-    String.prototype.format = function(...args) {
-      return this.replace(/\{(\d)\}/g, (_, $1) => args[+$1]);
-    };
-
-    let getArgs = (f) => f.toString().match(/\((.*)\)\W?{/)[1].replace(/ /g, '');
-    let getBody = (value, idx) => value.where ? `.where($q[${idx}].where)` : '';
-    let getFormat = (body, action, k, idx) => `$q[${idx}].queryableEntity${body}.${action}(function(${k.name}) { return {0}; })`;
-
     class QueryableObject {
       constructor({name, queryableEntity, where}) {
         Object.assign(this, { name, queryableEntity, where });
+      }
+
+      match({ queryableObjectPath, constraintObjectPath }) {
+        return this.where
+          ? constraintObjectPath(this.queryableEntity, this.where)
+          : queryableObjectPath(this.queryableEntity)
       }
     }
 
@@ -45,14 +43,19 @@ export default (() => {
 
       select(func) {
         let $q = this.queryableObjects;
-        
-        if ($q.length === 0) return;
-        
-        let getAction = (orig, i) => orig.length === (i + 1) ? 'select' : 'selectMany';
-        let resolveReduce = (str, value, i, orig) => str.format(getFormat(getBody(value, i), getAction(orig, i), value, i));
 
-        let ac = $q.reduce(resolveReduce, '{0};').format(`func(${ getArgs(func) })`);
-        return eval(ac);
+        let bind = function(item, instruction, target) {
+          return (...args) => item[instruction](target.bind(item, ...args));
+        }
+
+        return $q.reduceRight((func, item, idx, orig) => {
+          let entity = item.match({
+            queryableObjectPath: (entity) => entity,
+            constraintObjectPath: (entity, where) => entity.where(where)
+          });
+          
+          return bind(entity, (idx + 1 == orig.length) ? 'select' : 'selectMany', func);
+        }, func)();
       }
     }
 
