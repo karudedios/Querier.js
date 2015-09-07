@@ -42,13 +42,11 @@ export default (() => {
       }
 
       select(func) {
-        let $q = this.queryableObjects;
-
         let bind = function(item, instruction, target) {
           return (...args) => item[instruction](target.bind(item, ...args));
         };
 
-        return $q.reduceRight((func, item, idx, orig) => {
+        return this.queryableObjects.reduceRight((func, item, idx, orig) => {
           let entity = item.match({
             queryableObjectPath: (entity) => entity,
             constraintObjectPath: (entity, where) => entity.where(where)
