@@ -6,7 +6,7 @@ export default (() => {
 
     match({ node, empty }) {
       return this instanceof NodeList
-        ? node(this.value, this.tail)
+        ? node(this.head, this.tail)
         : empty();
     }
 
@@ -50,15 +50,15 @@ export default (() => {
   }
 
   class NodeList extends List {
-    constructor(value, tail) {
+    constructor(head, tail) {
       super(false);
-      Object.assign(this, { value, tail });
+      Object.assign(this, { head, tail });
     }
 
     toString() {
       return this.tail instanceof NodeList
-        ? `${this.value}, ` + this.tail.toString()
-        : `${this.value}`;
+        ? `${this.head}, ` + this.tail.toString()
+        : `${this.head}`;
     }
   }
 
