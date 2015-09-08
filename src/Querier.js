@@ -21,6 +21,7 @@ export default (() => {
 
       append({ as, from, where }){
         let queryableObject = new QueryableObject({
+          //TODO: Make 'as' actually serve a purpose.
           name: as,
           queryableEntity: from,
           where: where
@@ -31,16 +32,13 @@ export default (() => {
         if (!this.queryableObjects.map(x => x.queryableEntity).every(object => object instanceof constructor)) {
           throw "Only objects of the same instance can be enumerated in a single query";
         }
-
-        if (this.queryableObjects.length > 0 && this.queryableObjects.some(qo => qo.queryableEntity.selectMany === undefined)) {
+        else if (this.queryableObjects.length > 0 && this.queryableObjects.some(qo => qo.queryableEntity.selectMany === undefined)) {
           throw "Some of the selected objects doesn't posses a 'selectMany' so multiple objects cannot be enumerated";
         }
-
-        if (!from.select) {
+        else if (!from.select) {
           throw "The selected Object doesn't posses a 'select' clause to use";
         }
-
-        if (where && !from.where) {
+        else if (where && !from.where) {
          throw "The selected Object doesn't posses a 'where' clause to use";
         }
 
