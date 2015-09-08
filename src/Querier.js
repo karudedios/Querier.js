@@ -1,6 +1,28 @@
 export default (() => {
   "use strict";
 
+  //////////////////////
+  // Array Extensions //
+  //////////////////////
+  
+  Array.prototype.select = function(func) {
+    return this.length > 0
+      ? [func(this[0])].concat(this.slice(1).select(func))
+      : [];
+  }
+
+  Array.prototype.selectMany = function(func) {
+    return this.length > 0
+      ? [].concat.apply([], [func(this[0])].concat(this.slice(1).select(func)))
+      : [];
+  }
+
+  Array.prototype.where = function(predicate) {
+    return this.length > 0
+      ? predicate(this[0]) && [this[0]].concat(this.slice(1).where(predicate)) || this.slice(1).where(predicate)
+      : [];
+  }
+
   let Querier = (() => {
     class QueryableObject {
       constructor({name, queryableEntity, where}) {
