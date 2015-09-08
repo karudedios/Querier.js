@@ -3,7 +3,5 @@
 
 #Querier.js
 
-The concept for this project was based off of C# Linq Query Syntax.
-
 ##Description
-The objective of Querier.js is to simplify some of the work when dealing with multiple 'enumerable' objects, 
+###TODO
