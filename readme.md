@@ -14,7 +14,7 @@ To use the Querier, depending what you're trying to do, you require to have cert
 
 *The following examples work based on the assumption that Array.prototype contains .select, .selectMany and .where clauses*
 
-1. **select**: In order to use a single `{ as, from }` clause, the Object you're trying to enumerate should posses a 'select' method.
+1. **select**: In order to use a single `{ as, from }` clause, the Object you're trying to enumerate should have a 'select' method.
 
   ```C#
     var collection = Enumerable.Range(1, 3).ToList();
@@ -31,7 +31,7 @@ To use the Querier, depending what you're trying to do, you require to have cert
       .select((a) => a + 3);
   ```
 
-2. **selectMany**: In order to use several `{ as, from }` clauses, the Object you're trying to enumerate should posses a 'selectMany' method.
+2. **selectMany**: In order to use several `{ as, from }` clauses, the Object you're trying to enumerate should have a 'selectMany' method.
 
   ```C#
     var collection = Enumerable.Range(1, 3).ToList();
@@ -52,7 +52,7 @@ To use the Querier, depending what you're trying to do, you require to have cert
       .select((a, b, c) => a + b + c);
   ```
 
-3. **where**: In order to use one or more `{ as, from, where}` clause, the Object you're trying to enumerate should posses a 'where' method.
+3. **where**: In order to use one or more `{ as, from, where}` clause, the Object you're trying to enumerate should have a 'where' method.
 
   ```C#
     var collection = Enumerable.Range(1, 3).ToList();
