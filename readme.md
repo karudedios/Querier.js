@@ -1,4 +1,6 @@
 [![Build Status](https://travis-ci.org/karudedios/Querier.js.svg?branch=master)](https://travis-ci.org/karudedios/Querier.js)
+[![npm version](https://badge.fury.io/js/querier.js.svg)](http://badge.fury.io/js/querier.js)
+[![devDependency Status](https://david-dm.org/karudedios/querier.js/dev-status.svg)](https://david-dm.org/karudedios/querier.js#info=devDependencies)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/karudedios/Querier.js/master/LICENSE)
 
 #Querier.js
