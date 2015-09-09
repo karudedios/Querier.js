@@ -1,11 +1,13 @@
 {
   "name": "querier.js",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "description": "Ease to query Enumerable entities",
-  "main": "src/Querier.js",
+  "main": "dist/Querier.js",
   "scripts": {
     "test": "jasmine --no-color tests/spec/Querier-spec.js",
     "lint": "jshint --verbose src/Querier.js",
+    "compile": "babel -d dist/ src/",
+    "prepublish": "npm run compile",
     "build": "npm run test && npm run lint"
   },
   "repository": {
@@ -19,6 +21,7 @@
   },
   "homepage": "https://github.com/karudedios/Querier.js#readme",
   "devDependencies": {
+    "babel": "^5.8.23",
     "jasmine-es6": "0.0.17",
     "jshint": "2.8.0"
   }
