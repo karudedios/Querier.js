@@ -20,6 +20,6 @@
   "homepage": "https://github.com/karudedios/Querier.js#readme",
   "devDependencies": {
     "jasmine-es6": "0.0.17",
-    "jshint": "^2.8.0"
+    "jshint": "2.8.0"
   }
 }
