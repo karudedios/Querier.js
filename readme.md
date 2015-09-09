@@ -14,7 +14,7 @@ To use the Querier, depending what you're trying to do, you require to have cert
 
 *Examples will be shown on both C#'s Linq and Javascript*
 
-*The following examples work based on the assumption that Array.prototype contains .select, .selectMany and .where clauses*
+*By including Querier.js you automatically get `.select`, `.selectMany` and `.where` on `Array.prototype`*
 
 1. **select**: In order to use a single `{ as, from }` clause, the Object you're trying to enumerate should have a 'select' method.
 

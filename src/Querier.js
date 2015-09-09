@@ -29,6 +29,13 @@ export default (() => {
         Object.assign(this, { name, queryableEntity, where });
       }
 
+      /**
+       * Method to decide the path the object is going to take
+       * Depending on it's content
+       * @param   {[Function]}  options.queryableObjectPath   Path to take if the object has no where
+       * @param   {[Function]}  options.constraintObjectPath  Path to take if the object has a where
+       * @return  {[T]}                                       Result of the selected Path
+       */
       match({ queryableObjectPath, constraintObjectPath }) {
         return this.where
           ? constraintObjectPath(this.queryableEntity, this.where)
@@ -41,6 +48,13 @@ export default (() => {
         Object.defineProperty(this, 'queryableObjects', { value: queryableObjects });
       }
 
+      /**
+       * Method to add more query constraints
+       * @param   {[String]}    options.as      Alias for the object
+       * @param   {[T]}         options.from    Queryable object
+       * @param   {[Function]}  options.where   Constraint
+       * @return  {[Query]}                     Query object
+       */
       append({ as, from, where }){
         let queryableObject = new QueryableObject({
           //TODO: Make 'as' actually serve a purpose.
@@ -79,6 +93,11 @@ export default (() => {
         super(queryableObjects);
       }
 
+      /**
+       * Executes the introduced Query
+       * @param   {[Function]}  func  Function to get from Query
+       * @return  {[T]}               Returns a T of Query type
+       */
       select(func) {
         let bind = function(item, instruction, target) {
           return (...args) => item[instruction](target.bind(item, ...args));
