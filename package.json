@@ -1,6 +1,6 @@
 {
   "name": "querier.js",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "Ease to query Enumerable entities",
   "main": "src/Querier.js",
   "scripts": {
