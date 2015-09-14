@@ -56,26 +56,35 @@ export default (() => {
        * @return  {[Query]}                     Query object
        */
       append({ as, from, where }){
+
+        if (!as) {
+          throw "'as' should be a string representing the alias of the object you want to query";
+        }
+        else if (!from) {
+          throw "'from' cannot be empty";
+        }
+        else {
+          let constructor = from.constructor;
+
+          if (!from.select) {
+            throw "The selected Object doesn't posses a 'select' clause to use";
+          } 
+          else if (!this.queryableObjects.map(x => x.queryableEntity).every(object => object instanceof constructor)) {
+            throw "Only objects of the same instance can be enumerated in a single query";
+          }
+          else if (this.queryableObjects.length > 0 && this.queryableObjects.some(qo => qo.queryableEntity.selectMany === undefined)) {
+            throw "Some of the selected objects doesn't posses a 'selectMany' so multiple objects cannot be enumerated";
+          }
+          else if (where && !from.where) {
+           throw "The selected Object doesn't posses a 'where' clause to use";
+          }
+        }
+
         let queryableObject = new QueryableObject({
           name: as,
           queryableEntity: from,
           where: where
         });
-
-        let constructor = from.constructor;
-
-        if (!this.queryableObjects.map(x => x.queryableEntity).every(object => object instanceof constructor)) {
-          throw "Only objects of the same instance can be enumerated in a single query";
-        }
-        else if (this.queryableObjects.length > 0 && this.queryableObjects.some(qo => qo.queryableEntity.selectMany === undefined)) {
-          throw "Some of the selected objects doesn't posses a 'selectMany' so multiple objects cannot be enumerated";
-        }
-        else if (!from.select) {
-          throw "The selected Object doesn't posses a 'select' clause to use";
-        }
-        else if (where && !from.where) {
-         throw "The selected Object doesn't posses a 'where' clause to use";
-        }
 
         return new Query(this.queryableObjects.concat([queryableObject]));
       }

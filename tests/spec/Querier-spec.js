@@ -8,6 +8,22 @@ describe("Querier", () => {
     class ObjectWithoutSelectMany { select() {} }
     class ObjectWithoutWhere { select() {} selectMany() {} }
 
+    it("should throw an exception when 'as' is not provided", () => {
+      let expected = "'as' should be a string representing the alias of the object you want to query";
+      
+      let failingFunction = () => Querier.append({ from: new ObjectWithoutSelectMany });
+      
+      expect(failingFunction).toThrow(expected)
+    });
+
+    it("should throw an exception when 'from' is not provided", () => {
+      let expected = "'from' cannot be empty";
+      
+      let failingFunction = () => Querier.append({ as: 'fail' });
+      
+      expect(failingFunction).toThrow(expected)
+    });
+
     it("should throw an exception when an object without 'select' clause is used", () => {
       let expected = "The selected Object doesn't posses a 'select' clause to use";
       
@@ -40,8 +56,8 @@ describe("Querier", () => {
       
       let failingFunction = () => Querier
         .append({ as: 'fail1', from: new ObjectWithoutWhere })
-        .append({ as: 'fail2', from: new ObjectWithoutSelect })
-        .append({ as: 'fail3', from: new ObjectWithoutSelectMany });
+        .append({ as: 'fail2', from: new ObjectWithoutSelectMany })
+        .append({ as: 'fail3', from: new ObjectWithoutSelect });
 
       expect(failingFunction).toThrow(expected);
     });
