@@ -57,7 +57,6 @@ export default (() => {
        */
       append({ as, from, where }){
         let queryableObject = new QueryableObject({
-          //TODO: Make 'as' actually serve a purpose.
           name: as,
           queryableEntity: from,
           where: where
@@ -99,6 +98,10 @@ export default (() => {
        * @return  {[T]}               Returns a T of Query type
        */
       select(func) {
+        let keys = this.queryableObjects.map((item) => item.name);
+
+        let middleMan = (...keys) => (...args) => keys.reduce((ob, item) => { ob[item] = args.shift(); return ob; }, {});
+
         let bind = function(item, instruction, target) {
           return (...args) => item[instruction](target.bind(item, ...args));
         };
@@ -110,7 +113,7 @@ export default (() => {
           });
           
           return bind(entity, (idx + 1 === orig.length) ? 'select' : 'selectMany', func);
-        }, func)();
+        }, middleMan(...keys))().select(func);
       }
     }
 
