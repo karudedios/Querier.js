@@ -13,7 +13,7 @@ export default (() => {
 
   Array.prototype.selectMany = function(func) {
     return this.length > 0
-      ? [].concat.apply([], [func(this[0])].concat(this.slice(1).select(func)))
+      ? [].concat.apply([], [func(this[0])].concat(this.slice(1).selectMany(func)))
       : [];
   };
 

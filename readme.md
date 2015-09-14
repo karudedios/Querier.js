@@ -4,12 +4,15 @@
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/karudedios/Querier.js/master/LICENSE)
 
 #Querier.js
+
 The concept for this project was based off of C# Linq Query Syntax.
 
 ##Description
+
 The objective of Querier.js is to simplify some of the work when dealing with multiple 'enumerable' objects.
 
 ##Usage
+
 To use the Querier, depending what you're trying to do, you require to have certain methods.
 
 *Examples will be shown on both C#'s Linq and Javascript*
