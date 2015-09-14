@@ -33,7 +33,7 @@ To use the Querier, depending what you're trying to do, you require to have cert
     ...
     Querier
       .append({ as: 'a', from: collection })
-      .select((a) => a + 3);
+      .select(({a}) => a + 3);
   ```
 
 2. **selectMany**: In order to use several `{ as, from }` clauses, the Object you're trying to enumerate should have a 'selectMany' method.
@@ -54,7 +54,7 @@ To use the Querier, depending what you're trying to do, you require to have cert
       .append({ as: 'a', from: collection })
       .append({ as: 'b', from: collection })
       .append({ as: 'c', from: collection })
-      .select((a, b, c) => a + b + c);
+      .select(({a, b, c}) => a + b + c);
   ```
 
 3. **where**: In order to use one or more `{ as, from, where}` clause, the Object you're trying to enumerate should have a 'where' method.
@@ -79,5 +79,7 @@ To use the Querier, depending what you're trying to do, you require to have cert
       .append({ as: 'a', from: collection, where: (a) => a % 2 === 0 })
       .append({ as: 'b', from: collection, where: (b) => b % 2 !== 0 })
       .append({ as: 'c', from: collection })
-      .select((a, b, c) => a + b + c);
+      .select(({a, b, c}) => a + b + c);
   ```
+
+**To Note:** Even though I always used the parameters in the order I appended them, you can have them in any order you'd like. Say, instead of `select({a, b, c})` you could have `select({c, b, a})` and it would work the same, I had them in order because I like it organized that way.
