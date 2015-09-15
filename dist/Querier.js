@@ -10,7 +10,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== 'function' 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-(function (self, Querier) {
+(function (root, factory) {
   "use strict";
 
   //////////////////////
@@ -30,15 +30,15 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   };
 
   if (typeof define === 'function' && define.amd) {
-    define([], Querier);
+    define([], factory);
   } else if (typeof exports === 'object') {
-    module.exports = Querier;
+    module.exports = factory;
   } else {
-    self.Querier = Querier;
+    root.Querier = factory.Querier;
   }
 
   return;
-})(undefined, (function () {
+})(window, (function () {
   "use strict";
 
   var Querier = (function () {

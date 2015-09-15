@@ -1,4 +1,4 @@
-((self, Querier) => {
+((root, factory) => {
   "use strict";
 
   //////////////////////
@@ -24,15 +24,15 @@
   };
 
   if (typeof define === 'function' && define.amd) {
-    define([], Querier);
+    define([], factory);
   } else if (typeof exports === 'object') {
-    module.exports = Querier;
+    module.exports = factory;
   } else {
-    self.Querier = Querier;
+    root.Querier = factory.Querier;
   }
 
   return;
-})(this, () => {
+})(window, () => {
   "use strict";
 
   let Querier = (() => {

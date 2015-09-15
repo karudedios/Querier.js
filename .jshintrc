@@ -11,5 +11,5 @@
   "unused":     true,
   "onecase":    true,
   "lastsemic":  true,
-  "predef" : ["define"]
+  "predef" : ["define", "window"]
 }
