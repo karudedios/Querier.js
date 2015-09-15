@@ -1,0 +1,22 @@
+{
+  "name": "Querier.js",
+  "version": "1.0.1",
+  "homepage": "https://github.com/karudedios/Querier.js",
+  "authors": [
+    "Carlos de Dios <c.dedios@outlook.com>"
+  ],
+  "description": "Ease to query Enumerable entities",
+  "main": "dist/Querier.js",
+  "moduleType": [
+    "amd",
+    "node",
+    "es6"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "node_modules",
+    "bower_components",
+    "tests",
+    "src"
+  ]
+}
