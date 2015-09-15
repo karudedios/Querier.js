@@ -1,4 +1,4 @@
-export default (() => {
+((self, Querier) => {
   "use strict";
 
   //////////////////////
@@ -22,6 +22,18 @@ export default (() => {
       ? predicate(this[0]) && [this[0]].concat(this.slice(1).where(predicate)) || this.slice(1).where(predicate)
       : [];
   };
+
+  if (typeof define === 'function' && define.amd) {
+    define([], Querier);
+  } else if (typeof exports === 'object') {
+    module.exports = Querier;
+  } else {
+    self.Querier = Querier;
+  }
+
+  return;
+})(this, () => {
+  "use strict";
 
   let Querier = (() => {
     class QueryableObject {
@@ -131,4 +143,4 @@ export default (() => {
 
   return { Querier };
 
-})();
+}());
