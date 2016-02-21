@@ -6,7 +6,7 @@
   "scripts": {
     "test": "jasmine --no-color tests/spec/Querier-spec.js",
     "lint": "jshint --verbose src/Querier.js",
-    "compile": "babel -d dist/ src/",
+    "compile": "babel src --presets es2015 --out-dir dist",
     "minify": "uglifyjs dist/Querier.js  --output dist/Querier.min.js",
     "prepublish": "npm run compile && npm run minify",
     "build": "npm run test && npm run lint"
@@ -23,6 +23,8 @@
   "homepage": "https://github.com/karudedios/Querier.js#readme",
   "devDependencies": {
     "babel": "^5.8.23",
+    "babel-cli": "^6.5.1",
+    "babel-preset-es2015": "^6.5.0",
     "jasmine-es6": "0.0.17",
     "jshint": "2.8.0",
     "uglifyjs": "^2.4.10"
