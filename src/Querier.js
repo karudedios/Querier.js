@@ -1,6 +1,5 @@
 class QueryableObject {
   constructor({name, queryableEntity, where}) {
-    console.log(name, queryableEntity, where);
     Object.assign(this, { name, queryableEntity, where });
   }
 
